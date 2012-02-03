@@ -11,8 +11,6 @@ handouttex: slides.tex
 handout: handouttex pdf
 
 slides.tex: plan.rst
-	@echo "Génération des images avec dot"
-	@dot -Tpng -o heritage.png inheritance.gv
 	@echo "Génération du fichier tex"
 	@rst2beamer --title="GELOL" \
 		--language="fr" \
