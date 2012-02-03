@@ -12,7 +12,7 @@ handout: handouttex pdf
 
 slides.tex: plan.rst
 	@echo "Génération du fichier tex"
-	@rst2beamer --title="GELOL" \
+	@rst2beamer --title="S8SIG" \
 		--language="fr" \
 		--centerfigs="True" \
 		plan.rst > slides.tex
@@ -37,11 +37,11 @@ slides.tex: plan.rst
 	@sed -i slides.tex -e '/\end{frame}/ i\
 	\\end{block}'
 	@echo "Ajout d'informations"
-	@sed -i slides.tex -e 's/^Programmation dans OrbisGIS - dummy title//'
+	@sed -i slides.tex -e 's/^Initiation à la progr - dummy title//'
 	@sed -i slides.tex -e '/\date/ a\
-	\\title{Intégration Continue}'
+	\\title{Initiation à la programmation spatiale sous OrbisGIS}'
 	@sed -i slides.tex -e 's/author{}/author{Alexis \\textsc{Guéganno} \\and Jean-Yves \\textsc{Martin}}/'
-	@sed -i slides.tex -e 's/date{}/date{26 septembre 2011}/'
+	@sed -i slides.tex -e 's/date{}/date{9 février 2012}/'
 
 
 clean:
@@ -54,7 +54,6 @@ clean:
 	@rm slides.snm
 	@rm slides.toc
 	@rm slides.vrb
-	@rm heritage.png
 
 mrproper: clean
 	@echo "Suppression du fichier PDF"
