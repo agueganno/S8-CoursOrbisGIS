@@ -117,7 +117,7 @@ Quelle structure de données sur le disque ?
  * Recherche dans un arbre équilibré (BTree) : Recherche dans une seule 
    direction dans l'index.
 
- Les indexes spatiaux (1)
+Les indexes spatiaux (1)
 --------------------------------------------------------------------------------
 
 Pour les données spatiales, on n'a pas de relation d'ordre simple. Mais on a 
@@ -127,7 +127,7 @@ Stratégie : partitonnement de l'espace. On analyse la configuration spatiale de
 données, et on construit un arbre reflétant l'organisation spatiale du jeu de 
 données...
 
- Les indexes spatiaux (1)
+Les indexes spatiaux (1)
 --------------------------------------------------------------------------------
 
 [Construire un schéma magnifique à insérer ici]
