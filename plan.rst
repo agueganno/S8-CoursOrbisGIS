@@ -45,7 +45,8 @@ Une gestion unifiée des sources de données (2)
 
 Utilisation de la notion de pilotes et d'importeurs (en construction) :
 
-[insérer un schéma magnifique ici]
+.. image:: gdmsStruct.png
+  :width: 80%
 
 Concrètement, ça marche ?
 --------------------------------------------------------------------------------
@@ -142,16 +143,20 @@ Quelle structure de données sur le disque ?
 Simple table clé-valeur (valeur cherchée, position dans le fichier) et 
 recherche par dichotomie : nombreuses opération d'entrée-sortie, coût élevé.
 
- 
- [Insérer un schéma magnifique ici]
+.. image:: dichotomie.png
+  :width: 75%
 
 Les indexes alpha-numériques (3)
 --------------------------------------------------------------------------------
 
-Recherche dans un arbre équilibré (BTree) : Recherche dans une seule 
-direction dans l'index.
+Utilisation d'un arbre de recherche équilibré (B+Tree) : Recherche dans une 
+seule direction dans l'index.
 
-[Insérer un schéma magnifique ici]
+.. image:: btree.png
+  :width: 75%
+
+Les indexes alpha-numériques (3)
+--------------------------------------------------------------------------------
 
 Avantages d'un arbre équilibré : 
 
@@ -160,7 +165,8 @@ Avantages d'un arbre équilibré :
 - Recherche (sur disque) des données peut être faite en lisant toujours dans
   le même sens
 
-[Insérer un schéma magnifique ici]
+.. image:: btreeOnFile.png
+  :width: 75%
 
 Les indexes spatiaux (1)
 --------------------------------------------------------------------------------
@@ -175,13 +181,18 @@ données...
 Les indexes spatiaux (2)
 --------------------------------------------------------------------------------
 
-[Construire un schéma magnifique à insérer ici]
+On partitionne l'espace...
+
+.. image:: BoundingBox.png
+  :width: 65%
 
 Les indexes spatiaux (3)
 --------------------------------------------------------------------------------
 
-[Construire un schéma magnifique à insérer ici]
+...et on en déduit un arbre de type BTree.
 
+.. image:: RTree.png
+  :width: 65%
 
 La couche de manipulation des données : gdmsql
 ================================================================================
@@ -221,7 +232,8 @@ Concrètement...
 C'est (presque) ce que vous avez utilisé en TP. Il s'agit de la nouvelle version
 du langage de manipulation des données inclus dans OrbisGIS.
 
-[Insérer schéma magnifique]
+.. image:: gdmsplit.png
+  :width: 65%
 
 Séparation de la gestion et de la manipulation-> possibilité de changer le 
 langage de manipulation sans altérer la gestion des données.
