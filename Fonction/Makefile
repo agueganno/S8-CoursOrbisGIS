@@ -39,9 +39,9 @@ slides.tex: plan.rst
 	@echo "Ajout d'informations"
 	@sed -i slides.tex -e 's/^Initiation à la progr - dummy title//'
 	@sed -i slides.tex -e '/\date/ a\
-	\\title{Initiation à la programmation spatiale sous OrbisGIS}'
+	\\title{Programmation dans OrbisGIS : définition d'une fonction GDMSQL}'
 	@sed -i slides.tex -e 's/author{}/author{Alexis \\textsc{Guéganno} \\and Jean-Yves \\textsc{Martin}}/'
-	@sed -i slides.tex -e 's/date{}/date{9 février 2012}/'
+	@sed -i slides.tex -e 's/date{}/date{10 février 2012}/'
 
 
 clean:

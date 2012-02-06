@@ -2,8 +2,7 @@
 Initiation à la progr - dummy title
 --------------------------------------------------------------------------------
 
-
-OrbisGIS- Principes de fonctionnement
+Objectifs du cours
 ================================================================================
 
 Objectifs du cours : 
