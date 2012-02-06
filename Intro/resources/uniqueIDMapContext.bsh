@@ -1,0 +1,4 @@
+import org.orbisgis.core.layerModel.DefaultMapContext;
+import org.orbisgis.core.layerModel.MapContext;
+DefaultMapContext  mc2 = mc;
+print(mc2.getIdTime());

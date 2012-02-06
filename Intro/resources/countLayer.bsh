@@ -1,0 +1,7 @@
+import org.orbisgis.Services;
+import org.orbisgis.editors.map.MapContextManager;
+import org.orbisgis.layerModel.MapContext;
+
+MapContextManager mcm = Services.getService(MapContextManager.class);
+MapContext mc = mcm.getActiveView();
+print(mc.getLayerModel().getLayerCount());

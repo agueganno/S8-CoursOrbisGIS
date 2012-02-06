@@ -1,0 +1,4 @@
+import org.orbisgis.core.layerModel.MapContext;
+MapContext mc = mc;
+
+print(mc.getLayerModel().getLayer(0).getDataSource().getCRS());

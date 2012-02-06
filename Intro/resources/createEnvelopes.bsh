@@ -1,0 +1,32 @@
+import org.gdms.data.DataSourceFactory;
+import org.gdms.data.metadata.DefaultMetadata;
+import org.gdms.data.types.Type;
+import org.gdms.data.types.TypeFactory;
+import org.gdms.data.values.ValueFactory;
+import org.gdms.driver.generic.GenericObjectDriver;
+import org.gdms.geometryUtils.EnvelopeUtil;
+import org.orbisgis.core.layerModel.ILayer;
+import org.orbisgis.core.layerModel.MapContext;
+import com.vividsolutions.jts.geom.Envelope;
+import org.gdms.data.values.Value;
+
+MapContext mc = mc;
+
+        DataSourceFactory dsf = dsf;
+
+        DefaultMetadata metadata = new DefaultMetadata( new Type[] {TypeFactory.createType(Type.STRING),TypeFactory.createType(Type.GEOMETRY) }, new String[] { "location", "the_geom"});
+
+        GenericObjectDriver driver = new GenericObjectDriver(metadata);
+
+        for (int i = 0; i< mc.getLayerModel().getLayerCount(); i++){
+        ILayer layer = mc.getLayerModel().getLayer(i);
+        String layerName = layer.getName();
+
+        Envelope enveloppe = layer.getDataSource().getFullExtent();
+
+        driver.addValues(new Value[]{ValueFactory.createValue(layerName + ".tiff"),
+                    ValueFactory
+                            .createValue(EnvelopeUtil.toGeometry(enveloppe))});
+        }
+
+        dsf.getSourceManager().register("mosaic", driver);

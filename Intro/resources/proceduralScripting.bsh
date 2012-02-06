@@ -1,0 +1,7 @@
+import org.gvsig.remoteClient.ILayer;
+import org.orbisgis.core.layerModel.MapContext;
+MapContext mc = mc;
+for (i=0; i<mc.getLayerModel().getLayerCount(); i++){
+name = mc.getLayerModel().getLayer(i).getName();
+SQL("select * from "+ name + " where length(the_geom)>1000");
+}

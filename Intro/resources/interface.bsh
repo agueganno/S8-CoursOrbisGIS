@@ -1,0 +1,26 @@
+import org.orbisgis.core.sif.UIFactory;
+import org.orbisgis.core.sif.multiInputPanel.IntType;
+import org.orbisgis.core.sif.multiInputPanel.MultiInputPanel;
+import org.orbisgis.core.sif.multiInputPanel.StringType;
+import org.orbisgis.core.ui.components.sif.LayerCombo;
+
+MultiInputPanel mip = new MultiInputPanel("Creation d'un buffer");
+
+mip.addInput("size", "Taille", new IntType());
+mip.addInput("name", "Nom couche", new LayerCombo(mc));
+
+
+
+
+if (UIFactory.showDialog(mip)){
+
+valeur = mip.getInput("size");
+maTable = mip.getInput("name");
+
+SQL("select st_buffer(the_geom," + valeur +") as the_geom from " + maTable +" ;");
+
+}
+
+
+
+

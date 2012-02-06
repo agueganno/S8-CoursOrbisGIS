@@ -1,0 +1,18 @@
+import java.awt.Color;
+import org.orbisgis.core.layerModel.MapContext;
+import org.orbisgis.core.renderer.legend.Legend;
+import org.orbisgis.core.renderer.legend.carto.*;
+import org.orbisgis.core.renderer.symbol.Symbol;
+import org.orbisgis.core.renderer.symbol.SymbolFactory;
+
+MapContext mc = mc;
+
+layer = mc.getLayerModel().getLayerByName("DEP_FRANCE");
+ProportionalLegend l1 = LegendFactory.createProportionalPointLegend();
+l1.setMaxSize(5000);
+l1.setLinearMethod();
+l1.setClassificationField("POP06");
+Symbol defaultSymbol = SymbolFactory.createPolygonSymbol(Color.black);
+UniqueSymbolLegend l2 = LegendFactory.createUniqueSymbolLegend();
+l2.setSymbol(defaultSymbol);
+layer.setLegend(l2, l1);

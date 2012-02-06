@@ -1,0 +1,17 @@
+import org.orbisgis.core.layerModel.MapContext;
+import org.orbisgis.core.sif.UIFactory;
+import org.orbisgis.core.sif.multiInputPanel.DoubleType;
+import org.orbisgis.core.sif.multiInputPanel.MultiInputPanel;
+import org.orbisgis.core.ui.components.sif.VectorLayerCombo;
+
+MultiInputPanel mip  = new MultiInputPanel("Buffer");
+
+layer = "Layer";
+distance = "Distance";
+
+mip.addInput(layer, "Couche : ", new VectorLayerCombo(mc));
+mip.addInput(distance, "Distance : ", new DoubleType());
+
+if (UIFactory.showDialog(mip)) {
+
+}

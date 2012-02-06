@@ -1,0 +1,20 @@
+//The classe for color
+import java.awt.Color;
+import org.orbisgis.core.layerModel.MapContext;
+import org.orbisgis.core.renderer.legend.carto.LegendFactory;
+import org.orbisgis.core.renderer.legend.carto.UniqueSymbolLegend;
+import org.orbisgis.core.renderer.symbol.Symbol;
+import org.orbisgis.core.renderer.symbol.SymbolFactory;
+import org.orbisgis.core.ui.components.sif.VectorLayerCombo;
+
+
+MapContext mc = mc;
+//Get a layer in the TOC
+layer = mc.getLayerModel().getLayer(0);
+//Create a new polygon symbol
+Symbol defaultSymbol = SymbolFactory.createPolygonSymbol(Color.blue, Color.cyan);
+//Build the legend
+UniqueSymbolLegend l = LegendFactory.createUniqueSymbolLegend();
+//Apply the symbol to the legend
+l.setSymbol(defaultSymbol);
+layer.setLegend(l);

@@ -1,0 +1,29 @@
+import org.gdms.data.values.ValueFactory;
+import org.orbisgis.geoview.renderer.Renderer;
+import org.orbisgis.geoview.renderer.classification.Range;
+import org.orbisgis.geoview.renderer.classification.RangeMethod;
+import org.orbisgis.geoview.renderer.legend.IntervalLegend;
+import org.orbisgis.geoview.renderer.legend.Legend;
+import org.orbisgis.geoview.renderer.legend.LegendFactory;
+import org.orbisgis.geoview.renderer.legend.ProportionalLegend;
+import org.orbisgis.geoview.renderer.legend.Symbol;
+import org.orbisgis.geoview.renderer.legend.SymbolFactory;
+import org.orbisgis.geoview.renderer.legend.UniqueSymbolLegend;
+s0 = SymbolFactory.createPolygonSymbol(Color.black, new Color(192, 192, 192));
+s1 = SymbolFactory.createPolygonSymbol(Color.black, new Color(128, 128, 128));
+s2 = SymbolFactory.createPolygonSymbol(Color.black, new Color(96, 96, 96));
+s3 = SymbolFactory.createPolygonSymbol(Color.black, new Color(32, 32, 32));
+defaultSymbol = SymbolFactory.createPolygonSymbol(Color.black);
+l = LegendFactory.createIntervalLegend();
+l.setClassificationField("area");
+l.setDefaultSymbol(defaultSymbol);
+l.addInterval(ValueFactory.createValue(0), true,
+    ValueFactory.createValue(0.25), false, s0);
+l.addInterval(ValueFactory.createValue(0.25), true,
+    ValueFactory.createValue(0.5), false, s1);
+l.addInterval(ValueFactory.createValue(0.5), true,
+    ValueFactory.createValue(0.75), false, s2);
+l.addInterval(ValueFactory.createValue(0.75), true,
+    ValueFactory.createValue(1), true, s3);
+vl = gc.getLayerModel().getLayerByName("density");
+vl.setLegend(l);

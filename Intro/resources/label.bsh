@@ -1,0 +1,7 @@
+import org.orbisgis.core.renderer.legend.carto.LegendFactory;
+
+ll = LegendFactory.createLabelLegend();
+ll.setClassificationField("type");
+
+vl = mc.getLayerModel().getLayerByName("landcover2000");
+vl.setLegend(ll);
