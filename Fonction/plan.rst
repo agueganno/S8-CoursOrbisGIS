@@ -29,15 +29,20 @@ Les systèmes de gestion de version
 ================================================================================
 
 Pour résoudre ces problèmes, on peut s'appuyer sur un système de gestion de 
-versions. La solution utilisée par l'équipe de développement d'OrbisGIS 
-s'appelle Subversion (SVN).
+versions. La solution utilisée actuellement par l'équipe de développement
+d'OrbisGIS s'appelle Subversion (SVN).
 
 http://subversion.tigris.org
 
 Les apports de SVN - la notion de commit
 ================================================================================
 
+Pour mieux comprendre les modifications apportées par les développeurs, il est
+intéressant de les gérer de façon incrémentale. On utilise pour cela la notion
+de commit :
 
+- Seules les lignes modifiées, ajoutées et supprimées sont communiquées.
+- Chaque modification est accompagnée d'un commentaire la décrivant
 
 Les apports de SVN - le suivi des modifications
 ================================================================================
