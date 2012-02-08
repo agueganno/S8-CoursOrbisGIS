@@ -1,9 +1,9 @@
---------------------------------------------------------------------------------
+================================================================================
 Initiation à la progr - dummy title
---------------------------------------------------------------------------------
+================================================================================
 
 Objectifs du cours
-================================================================================
+--------------------------------------------------------------------------------
 
 - Découvrir les outils permettant le développement d'OrbisGIS
 - Aller plus loin dans la connaissance des structures essentielles de GDMS
@@ -320,13 +320,26 @@ un type géométrique dédié :
 ::
 
   int GEOMETRY = 4096;
-  int POINT = 32768 | Type.GEOMETRY;
-  int LINESTRING = 65536| Type.GEOMETRY;
-  int POLYGON = 131072 | Type.GEOMETRY;
-  int MULTIPOLYGON = 262144 | Type.GEOMETRY;
-  int MULTILINESTRING = 524288 | Type.GEOMETRYCOLLECTION;
-  int MULTIPOINT = 1048576 | Type.GEOMETRYCOLLECTION;
-  int GEOMETRYCOLLECTION = 2097152 | Type.GEOMETRY;
+  int POINT = 32768
+    | Type.GEOMETRY;
+  int LINESTRING = 65536
+    | Type.GEOMETRY;
+  int POLYGON = 131072
+    | Type.GEOMETRY;
+  int MULTIPOLYGON = 262144
+    | Type.GEOMETRY;
+
+Les types de données géométriques (2)
+================================================================================
+
+::
+
+  int MULTILINESTRING = 524288
+    | Type.GEOMETRYCOLLECTION;
+  int MULTIPOINT = 1048576
+    | Type.GEOMETRYCOLLECTION;
+  int GEOMETRYCOLLECTION = 2097152
+    | Type.GEOMETRY;
 
 Les définitions de ces types sont un peu ésotériques... on utilise un opérateur
 bit à bit sur les entiers pour en modifier la valeur...
@@ -338,13 +351,18 @@ L'opérateur "|" peut être considérer comme un "ou logique". Si on l'applique 
 deux entiers, il va mettre à 1 les bits de l'entier résultant pour lesquels le 
 bit correspondant est mis à un dans au moins un des deux entiers d'entrée.
 
+Comment sont construits les types géométriques ? (2)
+================================================================================
+
 Concrètement...
 
-- 0001100111
-- |
-- 1001010011
-- -----------
-- 1001110111
+::
+
+  0001100111
+  |
+  1001010011
+  -========- 
+  1001110111
 
 Pour une puissance de deux, nous sommes sûrs qu'il n'y a qu'un seul bit à 1.
 On est sûr qu'il n'y aura pas de superposition entre les bits des puissances de 
@@ -361,18 +379,24 @@ Pour les types autres que GEOMETRY et GEOMETRYCOLLECTION, on fait un test
 d'égalité (==).
 
 Pour les types GEOMETRY et GEOMETRYCOLLECTION, on utilise l'opérateur bit à bit
-&. Il s'agit du et logique sur les bits. Ainsi, pour tester qu'un type est 
-bien compatible avec Type.GEOMETRY, on fera
+&. Il s'agit du et logique sur les bits.  
+
+Comment tester les types géométriques ?
+================================================================================
+
+Pour tester qu'un type est compatible avec Type.GEOMETRY, on fera
 
 ::
   
-  (monType.getTypeCode() & Type.GEOMETRY) != 0
+  (monType.getTypeCode() & 
+    Type.GEOMETRY) != 0
 
 Pour le type Type.GEOMETRYCOLLECTION :
 
 ::
   
-  (monType.getTypeCode() & Type.GEOMETRYCOLLECTION) != 0
+  (monType.getTypeCode() &
+    Type.GEOMETRYCOLLECTION) != 0
 
 
 Le type NULL
@@ -392,25 +416,161 @@ des données de Type Type.NULL dans une colonne de Type Type.NULL.
 Les contraintes sur les types de données
 ================================================================================
 
+Afin de forcer les données à respecter certains critères, on peut ajouter des
+contraintes sur les types de données. On s'en servira lors de chaque ajout dans
+une colonne. Pour que l'ajout soit possible, il faut que :
 
+- Le type de la donnée soit compatible avec le type de la colonne
+- La donnée respecte toutes les contraintes placées sur le type de la colonne
 
-Comment placer une contrainte sur un type ? 
+Quelles contraintes peut-on utiliser ?
 ================================================================================
+
+Cela dépend bien entendu du type... Pour un type INT, par exemple :
+
+- Valeur minimum
+- Valeur maximum
+
+Pour un champ géométrique : 
+
+- Dimension des points de l'objet (2D ou 3D) : certaines fonctions ont besoin 
+  de points définis avec trois dimensions.
+- Nature de l'objet : ponctuel, linéaire, surfacique.
+
+Comment manipuler les contraintes d'un type ? 
+================================================================================
+
+Les contraintes sont ajoutées à la construction du type. On passe pour cela en
+paramètre un tableau de constraintes au constructeur du type.
+
+Pour connaître les contraintes placées sur un type, on pourra :
+
+- Récupérer le tableau entier de contraintes
+- Récupérer directement une contrainte (générique) du tableau
 
 Les métadonnées
 ================================================================================
 
-Créer une métadonnée
+Les métadonnées sont les structures qui nous servent à décrire les tables dans 
+GDMS. Elles permettent d'identifier chacune des colonnes de la table. Pour cela,
+Elles sont constituées : 
+
+- D'une liste de String : Les noms des champs
+- D'une liste de Type
+
+On utilise à l'instanciation deux tableaux (un de String, un de Type). Ils 
+DOIVENT faire la même taille. Sinon, une exception est levée
+
+Passée l'instanciation, on manipule des champs : on ne peut pas ajouter ou 
+supprimer une entrée dans la liste de Type sans supprimer l'entrée 
+correspondante dans la liste de String.
+
+Créer et manipuler une métadonnée
 ================================================================================
+
+On utilisera la classe DefaultMetadata. On peut :
+
+- Créer une métadonnée vide
+- Créer une métadonnée à partir de deux tableaux : un de String et un de Type
+- Créer une métadonnée en copiant une métadonnée existante.
+
+Les manipulations sur les champs sont faites directement depuis les méthodes
+de la classe. Certaines opérations (recherche de champs géométriques, de clés
+primaires, recherche d'un champ spatial...) peuvent être effectuées grâce à
+la classe MetadataUtilities.
 
 Les données - les Value
 ================================================================================
 
+Jusqu'à présent, nous n'avons que décrit les données, sans expliquer comment 
+elles sont manipulées. Nous utilisons pour cela l'interface Value. Une Value
+embarque une donnée en la décrivant avec un type.
+
+- Pour récupérer le type : getType
+- Pour récupérer la valeur : getAs**Type**()
+
+Les données - les Value
+================================================================================
+
+Certaines opérations (mathématiques, logiques, mais aussi les getters...) sont 
+disponibles pour toutes les valeurs. Elles ne sont cependant pas toujours 
+implémentées. On ne peut en effet pas :
+
+- Additionner deux géométries.
+- Représenter une géométrie sous forme de date.
+- Faire un ou logique sur des chaînes de caractère.
+
+La présence de ces méthodes dans toutes les interfaces permet de gagner du
+temps lors de l'écriture des codes. La rigueur est de mise : en cas 
+d'incohérence, une exception sera levée
+
+Les données - le concept de Factory
+================================================================================
+
+On a vu que toutes les Value disposent d'un lot commun d'opérations. Ainsi, nous
+pouvons les manipuler de façon transparente. De la même façon, la création des
+Values est prévue pour être transparente. On utilise une *Factory*, c'est à 
+dire:
+
+- Une classe ne contenant que des méthodes statiques
+- Une classe dédiée à l'instanciation d'autre objets ayant un ancêtre commun
+
+On utilise les mécanismes de surcharge de Java : 
+
+- On peut avoir, dans une même classe, deux méthodes ayant le même nom si elles
+  ont des paramètres différents
+- Deux méthodes au même nom peuvent avoir un type de retour différent
+
 Les données - la classe ValueFactory
 ================================================================================
 
+La classe ValueFactory est, comme son nom l'indique, une Factory dédiée à la 
+création d'instances de Value. Par exemple :
+
+Pour créer une PointValue (si pt est un point) :
+
+::
+  
+  PointValue pv = 
+    ValueFactory.createValue(pt)
+
+Pour créer une StringValue : 
+
+::
+
+  StringValue sv =
+    StringValue.createValue("bonjour");
+
+Et enfin... les DataSource
+================================================================================
+
+Maintenant que nous avons réussi à :
+
+- Décrire les données
+- Construire et manipuler les données
+
+nous sommes presque capables de gérer une source de données.
+
+Accéder à une DataSource
+================================================================================
+
+Une source de données peut être ouverte ou fermée. La plupart des opérations ne
+peuvent être réalisées que sur une DataSource ouverte. Pour ouvrir une 
+DataSource, on utilise la méthode open().
+
+Une fois les manipulations terminées, il est important de fermer la source de 
+données. Cela permet de libérer les ressources, et de permettre à d'autres
+codes d'accéder à la donnée. Pour cela, on appelle la méthode close().
+
 Récupérer une donnée dans une DataSource
 ================================================================================
+
+Une DataSource est consituée de métadonnées, et de lignes de valeurs. On 
+peut également connaître :
+
+- le nombre de lignes contenues dans la DataSource avec getRowCount()
+- Le contenu d'une ligne avec getRow(int i), qui renvoie un tableau de Value[]
+- La Value (générique) avec 
 
 Ajouter une donnée à une DataSource
 ================================================================================
@@ -421,7 +581,18 @@ Insérer une donnée dans une DataSource
 Créer une DataSource
 ================================================================================
 
-i
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
