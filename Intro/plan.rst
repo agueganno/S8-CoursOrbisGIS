@@ -31,7 +31,7 @@ La couche de gestion des données : GDMS
 Une gestion unifiée des sources de données (1)
 --------------------------------------------------------------------------------
 
-GDMS :i Generic Datasource Management System. C'est la couche de gestion des 
+GDMS : Generic Datasource Management System. C'est la couche de gestion des 
 données dans OrbisGIS.
 
 Objectif : Assurer la transparence des opérations de manipulation des données,
@@ -115,7 +115,7 @@ Problème : Comment trouver une donnée rapidement ?
 
 Plus précisément :
 
-- Comment à trouver rapidement tous les enregistrements dont la valeur du
+- Comment trouver rapidement tous les enregistrements dont la valeur du
   champ "ALTITUDE" est 5 ?
 - Comment trouver toutes les géométries présentes dans une zone données ?
 
@@ -139,8 +139,9 @@ Les indexes alpha-numériques (2)
 
 Quelle structure de données sur le disque ?
 
-Simple table clé-valeur (valeur cherchée, position dans le fichier) et 
-recherche par dichotomie : nombreuses opération d'entrée-sortie, coût élevé.
+Première approche : Simple table clé-valeur (valeur cherchée, position dans le 
+fichier) et recherche par dichotomie : nombreuses opération d'entrée-sortie,
+coût élevé.
 
 .. image:: dichotomie.png
   :width: 75%
@@ -154,7 +155,7 @@ seule direction dans l'index.
 .. image:: btree.png
   :width: 75%
 
-Les indexes alpha-numériques (3)
+Les indexes alpha-numériques (4)
 --------------------------------------------------------------------------------
 
 Avantages d'un arbre équilibré : 
