@@ -96,6 +96,14 @@ Ces deux points sont bien sûr contraints :
 - À la qualité des messages de commit
 - À la qualité de la gestion du dépôt SVN.
 
+Les apports de SVN - la notion d'historique (3)
+================================================================================
+
+Grâce à l'historique, on évite parfois les catastrophes. Par exemple, on est 
+à l'abri d'une suppression accidentelle de fichiers. On peut toujours requêter
+l'historique et retrouver une ancienne version. Du moins tant que le serveur
+est vivant...
+
 SVN - quelques commandes de base
 ================================================================================
 
@@ -448,6 +456,26 @@ Pour connaître les contraintes placées sur un type, on pourra :
 - Récupérer le tableau entier de contraintes
 - Récupérer directement une contrainte (générique) du tableau
 
+Exemple de type créer avec une contrainte
+================================================================================
+
+En BeanShell :
+
+::
+  
+  import org.gdms.data.types.Type;
+  import org.gdms.data.types.TypeFactory;
+  import org.gdms.data.types.
+    GeometryDimensionConstraint;
+
+  //On veut des objets ponctuels
+  GeometryDimensionConstraint gdc = 
+    new GeometryDimensionConstraint(0);
+
+  Type geom = TypeFactory.
+    createType(Type.GEOMETRY, gdc);
+  print("success");
+
 Les métadonnées
 ================================================================================
 
@@ -479,6 +507,155 @@ de la classe. Certaines opérations (recherche de champs géométriques, de clé
 primaires, recherche d'un champ spatial...) peuvent être effectuées grâce à
 la classe MetadataUtilities.
 
+Création d'une métadonnée
+================================================================================
+
+Pour créer une métadonnée, on pourra procéder de la façon suivante :
+
+::
+
+  Type geom = TypeFactory.
+         createType(Type.GEOMETRY);
+  String f1 = "the_geom";
+  Type ent = TypeFactory.
+         createType(Type.INT);
+  String f2 = "numb";
+  Type[] arg0 = new Type[] 
+         {geom, ent};
+  String[] arg1 = new String[] 
+         {f1,f2};
+  Metadata md = 
+      new DefaultMetadata(arg0, arg1);
+  print("success");
+
+Pour ajouter un champ...
+================================================================================
+
+::
+ 
+  md = new DefaultMetadata();
+  Type geom = TypeFactory.createType(Type.GEOMETRY);
+  String f1 = "the_geom";
+  md.addField(f1, geom);
+  print("success");
+
+Analyser la structure d'un champ
+================================================================================
+
+::
+
+  md.getFieldCount();
+  md.getFieldName(1);
+  md.getFieldType(1).getTypeCode();
+
+
+Gérer les géométries dans GDMS
+================================================================================
+
+La gestion des objets géométriques dans GDMS est réalisée par le biais d'une
+bibliothèque extern : JTS (JTS Topology Suite). Elle fait référence dans le
+monde de Java, et a été portée dans d'autres langages (comme le JavaScript).
+
+Pourquoi JTS :
+
+- Développement actif
+- Réactivité du développeur
+- Reconnaissance très forte (Récompensée plusieurs fois à FOSS4G)
+- Très bonnes performances
+
+Les types Géométriques de JTS (1)
+================================================================================
+
+JTS a été conçu de façon a être compatible avec la SFS. Par conséquent, on va 
+retrouver les mêmes types géométriques que dans GDMS (que c'est beau le 
+hasard) :
+
+- Point et MultiPoint
+- LineString et MultiLineString
+- Polygon et MultiPolygon
+- Geometry et GeometryCollection
+
+Reste à instancier ces objets...
+
+Les types Géométriques de JTS (2)
+================================================================================
+
+Quelques notions sont essentielles pour utiliser JTS :
+
+- Les géométries sont constituées de coordonnées, instances de Coordinate.
+- On crée une LineString à partir d'un tableau de coordonnées
+- On crée un polygon à partir d'une instance de LinearRing (l'enveloppe) et 
+  d'un tableau de LinearRing (les trous)
+
+Le concept de Factory
+================================================================================
+
+Dans certaines bibliothèques, on est parfois amené à manipuler des objets qui :
+
+- Sont très proches par nature
+- Présentent des processus de manipulation et de création similaires
+
+Pour simplifier la gestion de ces objets, on utilise une *Factory*, c'est à 
+dire une classe dédiée à l'instanciation d'autre objets ayant un ancêtre commun.
+
+On utilise les mécanismes de surcharge de Java : 
+
+- On peut avoir, dans une même classe, deux méthodes ayant le même nom si elles
+  ont des paramètres différents
+- Deux méthodes au même nom peuvent avoir un type de retour différent
+
+La classe GeometryFactory
+================================================================================
+
+Dans JTS, le moyen le plus courant d'instancier les géométries est d'utiliser
+la classe GeometryFactory. Par exemple, pour créer une instance de point :
+
+::
+  
+  GeometryFactory gf = new GeometryFactory();
+  Coordinate c = new Coordinate(1,1);
+  Point p = gf.createPoint(c);
+
+Toutes ces classes sont présentes dans le package :
+
+::
+
+  com.vividsolutions.jts.geom
+
+Les opérations possibles grâce à JTS...
+================================================================================
+
+JTS met à notre disposition un très grand nombre de fonctions topologiques :
+intersection, union, différence... La documentation complète est disponible à
+l'adresse :
+
+http://tsusiatsoftware.net/jts/javadoc/index.html
+
+Un exemple d'opération : l'intersection.
+================================================================================
+
+On peut calculer l'intersection entre deux polygones :
+
+::
+  
+  GeometryFactory gf = new GeometryFactory();
+  Coordinate c1 = new Coordinate(1,1);
+  Coordinate c2 = new Coordinate(1,3);
+  Coordinate c3 = new Coordinate(3,3);
+  Coordinate c4 = new Coordinate(3,1);
+  Coordinate[] cs = new Coordinate[] {c1, c2, c3, c4, c1};
+  LinearRing lr = gf.createLinearRing(cs);
+  Polygon p1 = gf.createPolygon(lr, new LinearRing[]{});
+  Coordinate c12 = new Coordinate(0,0);
+  Coordinate c22 = new Coordinate(0,2);
+  Coordinate c32 = new Coordinate(2,2);
+  Coordinate c42 = new Coordinate(2,0);
+  Coordinate[] cs2 = new Coordinate[] {c12, c22, c32, c42, c12};
+  LinearRing lr2 = gf.createLinearRing(cs2);
+  Polygon p12 = gf.createPolygon(lr2, null);
+  Geometry ge = p12.intersection(p1);
+  print(ge);
+
 Les données - les Value
 ================================================================================
 
@@ -486,8 +663,10 @@ Jusqu'à présent, nous n'avons que décrit les données, sans expliquer comment
 elles sont manipulées. Nous utilisons pour cela l'interface Value. Une Value
 embarque une donnée en la décrivant avec un type.
 
-- Pour récupérer le type : getType
-- Pour récupérer la valeur : getAs**Type**()
+- Pour récupérer le type : getType()
+- Pour récupérer la valeur : getAs **Type** ()
+
+On récupère le type directement sous sa forme entière.
 
 Les données - les Value
 ================================================================================
@@ -503,23 +682,6 @@ implémentées. On ne peut en effet pas :
 La présence de ces méthodes dans toutes les interfaces permet de gagner du
 temps lors de l'écriture des codes. La rigueur est de mise : en cas 
 d'incohérence, une exception sera levée
-
-Les données - le concept de Factory
-================================================================================
-
-On a vu que toutes les Value disposent d'un lot commun d'opérations. Ainsi, nous
-pouvons les manipuler de façon transparente. De la même façon, la création des
-Values est prévue pour être transparente. On utilise une *Factory*, c'est à 
-dire:
-
-- Une classe ne contenant que des méthodes statiques
-- Une classe dédiée à l'instanciation d'autre objets ayant un ancêtre commun
-
-On utilise les mécanismes de surcharge de Java : 
-
-- On peut avoir, dans une même classe, deux méthodes ayant le même nom si elles
-  ont des paramètres différents
-- Deux méthodes au même nom peuvent avoir un type de retour différent
 
 Les données - la classe ValueFactory
 ================================================================================
@@ -540,6 +702,24 @@ Pour créer une StringValue :
 
   StringValue sv =
     StringValue.createValue("bonjour");
+
+Valider une Value avec une contrainte
+================================================================================
+
+On peut utiliser une instance de Constraint pour valider une instance de Value :
+
+::
+
+  Polygon p1 = gf.createPolygon(lr, 
+    new LinearRing[]{});
+  Coordinate cp = new Coordinate(1,1); 
+  Point point = gf.createPoint(cp);
+  GeometryDimensionConstraint gd = 
+  new GeometryDimensionConstraint(0);
+  Value v1 = ValueFactory.createValue(p1);
+  Value v2 = ValueFactory.createValue(point);
+  print(gd.check(v2));
+  print(gd.check(v1));
 
 Et enfin... les DataSource
 ================================================================================
@@ -569,14 +749,22 @@ Une DataSource est consituée de métadonnées, et de lignes de valeurs. On
 peut également connaître :
 
 - le nombre de lignes contenues dans la DataSource avec getRowCount()
-- Le contenu d'une ligne avec getRow(int i), qui renvoie un tableau de Value[]
-- La Value (générique) avec 
+- Le contenu d'une ligne avec getRow(long i), qui renvoie un tableau de Value[]
+- La Value (générique) avec getFieldValue(long rowIndex, int fieldId);
 
 Ajouter une donnée à une DataSource
 ================================================================================
 
-Insérer une donnée dans une DataSource
-================================================================================
+On n'ajoute pas vraiment une donnée à une DataSource. On ajoute plutôt une ligne
+de données, ou plus précisément un tableau de Values. Il doit correspondre en
+taille et en types avec les métadonnées de la table.
+
+- Pour ajouter une ligne à la fin : insertFilledRow(Value[] values)
+- Pour ajouter une ligne à un indice donné : insertFilledRowAt(long index, 
+  Value[] values)
+
+On dispose également de nombreux setters pour modifier la valeur d'une cellule
+existante du tableau.
 
 Créer une DataSource
 ================================================================================
