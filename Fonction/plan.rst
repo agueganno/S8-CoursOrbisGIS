@@ -5,9 +5,9 @@ Initiation à la progr - dummy title
 Objectifs du cours
 --------------------------------------------------------------------------------
 
-- Découvrir les outils permettant le développement d'OrbisGIS
+- Découvrir les outils permettant de développer avec OrbisGIS
 - Aller plus loin dans la connaissance des structures essentielles de GDMS
-- Créer une nouvelle fonction d'analyse dans GDMSQL
+- Enrichir la couche de gestion des donées d'une nouvelle fonction d'analyse
 
 
 Les outils de développement indispensables
@@ -117,14 +117,14 @@ SVN - quelques commandes de base
 SVN - conclusion
 ================================================================================
 
-SVN est un outils qui permet de conserver une vision claire :
+SVN est un outil qui permet de conserver une vision claire :
 
 - Du travail effectué par tous les développeurs sur un projet
 - De l'évolution d'un projet
 - De la qualité ponctuelle des modifications apportées à un projet
 
-Il s'agit également, au travers des messages de commit, d'un moyen de
-communication au sein de l'équipe.
+Les messages de commit constituent également un moyen de communication au sein 
+de l'équipe.
 
 Maven - une gestion simplifiée du processus de build
 ================================================================================
@@ -135,13 +135,13 @@ d'un outil permettant de gérer :
 - Les dépendances d'un projet.
 - Les différentes phases de la construction d'un projet.
 
-Il réalise certaines tâches décrites parfois dans des Makefile
+Il réalise certaines tâches décrites parfois dans des Makefile (CF ALGPR)
 
 Maven - le paradigme Convention over Configuration (1)
 ================================================================================
 
 Le principe fondateur de Maven est le suivant : les projets Java respectent
-très souvent la même architecture et les même processus de construction. On va 
+très souvent la même architecture et les mêmes procédures de construction. On va
 les définir comme convention pour éviter d'avoir à faire de la configuration 
 qui serait :
 
@@ -193,7 +193,7 @@ Maven : Récupération et gestion des dépendances
 
 Pour récupérer et gérer les dépendances du projet, Maven a besoin : 
 
-- De dépôts distants où il pourra chercher à les télécharger
+- De dépôts distants où il pourra les télécharger
 - D'un dépôt local où il va les stocker. Ainsi, on évite les téléchargements 
   inutiles.
 
@@ -223,7 +223,7 @@ Maven prévoit plusieurs de ces phases :
 
 - compile : Compilation du projet
 - test-compile : Compilation des test du projet
-- test : exécution des tests du projet
+- test : Exécution des tests du projet
 - package : Packaging du projet (création du jar)
 - install : Installation du package (jar+pom) dans le dépôt Maven local
 - deploy : Installation du package (jar+pom) sur un serveur distant
@@ -349,8 +349,8 @@ Les types de données géométriques (2)
   int GEOMETRYCOLLECTION = 2097152
     | Type.GEOMETRY;
 
-Les définitions de ces types sont un peu ésotériques... on utilise un opérateur
-bit à bit sur les entiers pour en modifier la valeur...
+Les définitions de ces types sont particulières. On utilise un opérateur bit à
+bit sur les entiers pour en modifier la valeur...
 
 Comment sont construits les types géométriques ?
 ================================================================================
@@ -387,7 +387,7 @@ Pour les types autres que GEOMETRY et GEOMETRYCOLLECTION, on fait un test
 d'égalité (==).
 
 Pour les types GEOMETRY et GEOMETRYCOLLECTION, on utilise l'opérateur bit à bit
-&. Il s'agit du et logique sur les bits.  
+&. Il s'agit du "et logique" sur les bits.  
 
 Comment tester les types géométriques ?
 ================================================================================
@@ -417,7 +417,7 @@ Il existe un type NULL, dans GDMS, accessible grâce au champ
   Type.NULL
 
 Ce champ est compatible avec tous les autres types de données. On pourra donc 
-mettre un valeur de Type Type.NULL dans n'importe quelle colonne (sauf
+mettre une valeur de Type Type.NULL dans n'importe quelle colonne (sauf
 contrainte contraire). On ne pourra par contre pas mettre autre chose que 
 des données de Type Type.NULL dans une colonne de Type Type.NULL.
 
@@ -449,14 +449,14 @@ Comment manipuler les contraintes d'un type ?
 ================================================================================
 
 Les contraintes sont ajoutées à la construction du type. On passe pour cela en
-paramètre un tableau de constraintes au constructeur du type.
+paramètre un tableau de contraintes au constructeur du type.
 
 Pour connaître les contraintes placées sur un type, on pourra :
 
 - Récupérer le tableau entier de contraintes
 - Récupérer directement une contrainte (générique) du tableau
 
-Exemple de type créer avec une contrainte
+Exemple de type créé avec une contrainte
 ================================================================================
 
 En BeanShell :
@@ -553,8 +553,9 @@ Gérer les géométries dans GDMS
 ================================================================================
 
 La gestion des objets géométriques dans GDMS est réalisée par le biais d'une
-bibliothèque extern : JTS (JTS Topology Suite). Elle fait référence dans le
-monde de Java, et a été portée dans d'autres langages (comme le JavaScript).
+bibliothèque externe : JTS (JTS Topology Suite). Elle fait référence dans le
+monde de Java, et a été portée dans d'autres langages (comme JavaScript ou C.
+PostGIS utilise GEOS, le portage de JTS en C).
 
 Pourquoi JTS :
 
@@ -566,9 +567,9 @@ Pourquoi JTS :
 Les types Géométriques de JTS (1)
 ================================================================================
 
-JTS a été conçu de façon a être compatible avec la SFS. Par conséquent, on va 
-retrouver les mêmes types géométriques que dans GDMS (que c'est beau le 
-hasard) :
+JTS a été conçu de façon a être compatible avec la SFS (Simple Feature SQL). Par
+conséquent, on va retrouver les mêmes types géométriques que dans GDMS (que 
+c'est beau le hasard) :
 
 - Point et MultiPoint
 - LineString et MultiLineString
@@ -592,8 +593,8 @@ Le concept de Factory
 
 Dans certaines bibliothèques, on est parfois amené à manipuler des objets qui :
 
-- Sont très proches par nature
-- Présentent des processus de manipulation et de création similaires
+- sont très proches par nature
+- présentent des processus de manipulation et de création similaires
 
 Pour simplifier la gestion de ces objets, on utilise une *Factory*, c'est à 
 dire une classe dédiée à l'instanciation d'autre objets ayant un ancêtre commun.
@@ -643,14 +644,23 @@ On peut calculer l'intersection entre deux polygones :
   Coordinate c2 = new Coordinate(1,3);
   Coordinate c3 = new Coordinate(3,3);
   Coordinate c4 = new Coordinate(3,1);
-  Coordinate[] cs = new Coordinate[] {c1, c2, c3, c4, c1};
+  Coordinate[] cs =
+    new Coordinate[] {c1, c2, c3, c4, c1};
   LinearRing lr = gf.createLinearRing(cs);
-  Polygon p1 = gf.createPolygon(lr, new LinearRing[]{});
+  Polygon p1 = gf.createPolygon(lr, 
+    new LinearRing[]{});
+
+Un exemple d'opération : l'intersection.
+================================================================================
+
+::
+
   Coordinate c12 = new Coordinate(0,0);
   Coordinate c22 = new Coordinate(0,2);
   Coordinate c32 = new Coordinate(2,2);
   Coordinate c42 = new Coordinate(2,0);
-  Coordinate[] cs2 = new Coordinate[] {c12, c22, c32, c42, c12};
+  Coordinate[] cs2 = 
+     new Coordinate[] {c12, c22, c32, c42, c12};
   LinearRing lr2 = gf.createLinearRing(cs2);
   Polygon p12 = gf.createPolygon(lr2, null);
   Geometry ge = p12.intersection(p1);
