@@ -7,7 +7,7 @@ Objectifs du cours
 
 - Découvrir les outils permettant de développer avec OrbisGIS
 - Aller plus loin dans la connaissance des structures essentielles de GDMS
-- Enrichir la couche de gestion des donées d'une nouvelle fonction d'analyse
+- Enrichir la couche de gestion des données d'une nouvelle fonction d'analyse
 
 
 Les outils de développement indispensables
@@ -388,6 +388,18 @@ d'égalité (==).
 
 Pour les types GEOMETRY et GEOMETRYCOLLECTION, on utilise l'opérateur bit à bit
 &. Il s'agit du "et logique" sur les bits.  
+
+Le & binaire concrètement
+================================================================================
+
+::
+
+  0001100111
+  &
+  1001010011
+  -========- 
+  0001000011
+
 
 Comment tester les types géométriques ?
 ================================================================================
@@ -779,15 +791,148 @@ existante du tableau.
 Créer une DataSource
 ================================================================================
 
+Là encore, le moyen le plus commun pour créer une DataSource est d'utiliser
+la factory dédiée : **DataSourceFactory**. Ici encore le fait de passer par une
+factory présente des avantages :
+
+- Pas besoin de connaître l'API des pilotes
+- Appel transparent quel que soit le fichier
+
+Il existe des raccourcis pour créer une DataSource (SourceManager, 
+DataManager).
+
+Création d'une DataSource
+================================================================================
+
+::
+
+  MapContext mc = mc;
+  DataManager dm = 
+    Services.getService(DataManager.class);
+  DataSourceFactory dsf = 
+    dm.getDataSourceFactory();
+  File f = new File("/home/alexis/Documents/"
+    + "DataS8/Data_lab_OrbisGIS_1/Vecteur/"
+    + "DEP_FRANCE.shp");
+  DataSource ds = dsf.getDataSource(f);
+  ds.open();
+  print(ds.getAsString());
+  ILayer layer = dm.createLayer(ds);
+  mc.getLayerModel().addLayer(layer);
+
+Récupération des données
+================================================================================
+
+Ligne entière :
+
+::
+
+  Value[] vals = ds.getRow(0);
+  print(vals.get(2));
 
 
+Valeur seule :
 
+::
 
+  Value val = ds.getFieldValu(0,2);
+  print(val);
 
+Ou, si on veut récupérer le contenu de la Value :
 
+::
 
+  Value val = ds.getString(0,2);
+  print(val);
 
+DataManager et SourceManager - La gestion des sources
+================================================================================
 
+Au sein du logiciel, afin d'harmoniser la gestion des sources de données, trois
+classes ne sont instanciées qu'une fois.
+
+- Le DataManager va gérer toutes les sources déclarées dans le logiciel,
+  temporaires ou non.
+- On a une seule instance de DataSourceFactory, utilisable partout dans le 
+  logiciel. Cette instance est liée au DataManager
+- On a une seule instance de SourceManager, qui gère toutes les sources de 
+  données permanentes. Elle est liée au DataSourceFactory.
+
+Petit bilan...
+================================================================================
+
+À ce stade, nous sommes capables de :
+
+- Créer un Type
+- Placer des contraintes sur un type
+- Créer des valeurs alpha-numériques
+- Créer des valeurs géométriques
+- Manipuler les géométries avec JTS
+- Manipuler des sources de données
+
+Nous avons donc toutes les cartes en main pour créer nos propres fonctions
+SQL
+
+Création de fonction dans GDMSQL
+--------------------------------------------------------------------------------
+
+Préambule...
+================================================================================
+
+Nous atteignons un stade où il n'est plus possible de remplir nos objectifs à
+l'aide du BeanShell. Nous allons installer un nouvel outil Netbeans, afin
+de pouvoir utiliser Maven et SVN. L'installation se fera sous Linux, pour 
+des raisons pratiques...
+
+GDMSQL, une couche extensible
+================================================================================
+
+On peut distinguer deux parties dans GDMSQL : 
+
+- L'interpréteur du langage.
+- Les fonctions métiers.
+
+Si l'interpréteur n'est a priori pas destiné à subir des modifications 
+extérieures, les fonctions peuvent être enrichies de nouvelles procédures. On 
+distingue deux types de fonctions :
+
+- Les fonctions scalaires, avec plus précisément :
+
+  - Les fonctions aggrégées
+  - Les fonctions non aggrégées
+
+- Les fonctions tables
+
+Les fonctions scalaires
+================================================================================
+
+Une fonction scalaire renvoie une valeur scalaire (ie une simple Value, dans
+notre cas). 
+
+- Les fonctions aggrégées produisent un résultat basé sur l'analyse d'une 
+  colonne. Ex : COUNT, MAX, AVG...
+- Les fonctions non aggrégées produisent un résultat basé sur une ou plusieurs
+  valeurs d'une ligne (COS, ROUND...)
+
+Les fonctions tables
+================================================================================
+
+Une fonction table produit une table de données, représentée comme une 
+DataSource, en se basant sur les informations présentes dans les champs données
+en paramètre.
+
+Exemple : ST_Explode, ST_SplitLine
+
+La gestion des fonctions dans GDMSQL
+================================================================================
+
+Il est possible d'ajouter des fonctions à GDMSQL, par le biais de la classe
+FunctionManager. Elle permet d'ajouter et de supprimer statiquement des
+fonctions SQL lors de l'exécution du logiciel.
+
+Lors de l'exécution d'un script SQL contenant une fonction, GDMSQL interroge
+cette classe. Il peut alors instancier la ou les fonctions nécessaire, et enfin
+exécuter le script désiré.
 
 
 
