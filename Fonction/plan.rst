@@ -894,7 +894,7 @@ On peut distinguer deux parties dans GDMSQL :
 
 Si l'interpréteur n'est a priori pas destiné à subir des modifications 
 extérieures, les fonctions peuvent être enrichies de nouvelles procédures. On 
-distingue deux types de fonctions :
+distingue trois types de fonctions :
 
 - Les fonctions scalaires, avec plus précisément :
 
@@ -902,6 +902,7 @@ distingue deux types de fonctions :
   - Les fonctions non aggrégées
 
 - Les fonctions tables
+- Les fonctions "executor"
 
 Les fonctions scalaires
 ================================================================================
@@ -923,6 +924,22 @@ en paramètre.
 
 Exemple : ST_Explode, ST_SplitLine
 
+Les fonctions executor
+================================================================================
+
+Les fonctions "executor" permettent de réaliser des opérations ailleurs que sur
+les données (sur l'UI, par exemple). Elles sont appelées grâce à l'instruction
+SQL 
+
+::
+
+  EXECUTE
+
+et permettent, par exemple :
+
+- d'ajouter une couche au MapContext depuis un appel SQL.
+- de zoomer sur une zone précise d'une carte.
+
 La gestion des fonctions dans GDMSQL
 ================================================================================
 
@@ -934,14 +951,268 @@ Lors de l'exécution d'un script SQL contenant une fonction, GDMSQL interroge
 cette classe. Il peut alors instancier la ou les fonctions nécessaire, et enfin
 exécuter le script désiré.
 
+Création d'une fonction scalaire
+================================================================================
+
+La première fonction que nous allons créer sera scalaire. Elle nous permettra
+de calculer la densité d'une propriété dans un polygone. Nous l'appellerons
+ST_Density.
+
+Pour créer une fonction scalaire, nous allons devoir créer une nouvelle classe.
+On va la placer dans un package dédié à nos travaux :
+
+::
+
+  package org.gdms.sql.function.shuit;
+
+  public class ST_Density {
+
+  }
+
+Implémentation de ScalarFunction
+================================================================================
+
+Les fonctions scalaires implémentent toutes l'interface ScalarFunction. On ne va 
+pas l'implémenter directement : certaines méthodes sont communes à toutes les
+fonctions scalaires et sont déjà décrites dans la classe abstraite
+AbstractScalarFunction :
+
+- isAggregate() -> false
+- isScalar() -> true
+- isTable() -> false
+- isExecutor -> false
+
+Rien de surprenant, donc...
+
+Héritage de AbstractScalarFunction
+================================================================================
+
+Nous héritons donc directement de AbstractScalarFunction :
+
+::
+
+  package org.gdms.sql.function.shuit;
+  import org.gdms.sql.function.
+      AbstractScalarFunction;
+  public class ST_Density 
+      extends AbstractScalarFunction{}
 
 
+Ce qu'il nous reste à faire
+================================================================================
 
+À ce stade, nous ne sommes pas capable de compiler notre fonction. En effet,
+certaines méthodes imposées par l'interface ScalarFunction ne sont pas
+implémentées ! Ces méthodes sont :
 
+- getType
+- getDescription
+- getFunctionSignatures
+- getName
+- getSqlOrder
+- evaluate
 
+Description des méthodes : getType
+================================================================================
 
+getType permet de spécifier le type de la valeur de retour de notre fonction
+scalaire, en fonction des types des valeurs en entrée. Dans notre cas, nous
+allons renvoyer un double, la méthode devient donc :
 
+::
 
+  public Type getType(Type[] argsTypes) {
+    return TypeFactory.createType(Type.DOUBLE);
+  }
+
+Nous avons besoin d'importer les classes :
+
+::
+
+  org.gdms.data.types.Type
+  org.gdms.data.types.TypeFactory
+
+Description des méthodes : getDescription
+================================================================================
+
+Cette méthode permet de donner une description textuelle de la fonction. Elle
+ernvoie la description sous forme de chaîne de caractères :
+
+::
+
+  public String getDescription() {
+    return "Compute a density";
+  }
+
+Description des méthodes : getFunctionSignatures
+================================================================================
+
+Cette méthode renvoie les signatures autorisées pour appeler la fonction. On
+appelle signature un ensemble de types tels que des valeurs respectant ces types
+pourront être utilisées comme paramètre de la fonction. Dans notre cas, nous
+avons besoin d'une géométrie et d'un numérique comme arguments de notre 
+fonction. La signature précise également le type de retour de la fonction.
+
+Pour créer une signature, nous avons besoin de plusieurs choses :
+
+- Le type de retour (avec getType)
+- Un instance de ScalarArgument pour chacun de nos arguments.
+
+La classe ScalarArgument
+================================================================================
+
+ScalarArgument est utilisé par le moteur d'exécution SQL pour valider les appels
+faits aux fonctions SQL. Les différents types possibles sont définis directement
+dans ScalarArgument. Dans notre cas, nous avons besoin de :
+
+- ScalarArgument.GEOMETRY
+- ScalarArgument.INT
+
+La construction de notre signature se fait donc comme suit :
+
+::
+
+  new BasicFunctionSignature(
+    getType(null),
+    ScalarArgument.GEOMETRY, 
+    ScalarArgument.INT)
+
+Implémentation de getFunctionSignatures
+================================================================================
+
+La méthode getFunctionSignatures peut donc être implémentée de la façon
+suivante :
+
+::
+
+  public FunctionSignature[] 
+  getFunctionSignatures() {
+    return new FunctionSignature[]{
+    new BasicFunctionSignature(
+        getType(null),
+        ScalarArgument.GEOMETRY, 
+        ScalarArgument.INT)
+    };
+  }
+
+Description des méthodes - getName
+================================================================================
+
+getName renvoie une chaîne de caractère, qui correspond au nom de la fonction
+tel qu'il sera appelé dans les scripts SQL.
+
+::
+
+  public String getName() {
+    return "ST_Density";
+
+Description des méthodes - getSqlOrder
+================================================================================
+
+Cette méthode renvoie un exemple (simple) d'utilisation de la fonction en SQL.
+Nous pouvons donc l'implémenter comme suit :
+
+::
+
+  public String getSqlOrder() {
+    return "select ST_Density(the_geom,i)"
+      +" from table;";
+  }
+
+Description des méthodes - evaluate
+================================================================================
+
+Cette méthode réunit l'intelligence de la fonction. C'est ici que sont
+récupérées les valeurs d'entrée, qu'elles sont traitées, et que la valeur de
+retour est renvoyée.
+
+Le moteur SQL se charge, en amont, de :
+
+- valider le nombre d'arguments.
+- valider le type du ou des arguments.
+
+Le moteur SQL vérifie en aval que la valeur renvoyée est bien du type attendu.
+
+Les arguments de evaluate
+================================================================================
+
+La définition (signature) de evaluate est la suivante :
+
+::
+
+  public Value evaluate(
+      SQLDataSourceFactory dsf, 
+      Value... args) 
+    throws FunctionException
+
+Nous avons donc à disposition :
+
+- Un DataSourceFactory pour, éventuellement, manipuler des DataSource
+- Un tableau de valeurs (args)
+
+En cas de problèmes, nous sommes invités à émettre une FunctionException.
+
+Implémentation de evaluate (1)
+================================================================================
+
+Nous allons devoir calculer l'aire d'une géométrie. Pour cela, nous devons :
+
+- Récupérer la géométrie
+- L'identifier comme un polygone ou un multipolygon
+- Récupérer son aire.
+
+On va créer une méthode dédiée
+
+Calcul de l'aire de la géométrie
+================================================================================
+
+::
+
+  private double getGeometryArea(
+      Geometry geom){
+    if(geom instanceof Polygon){
+      Polygon poly = (Polygon) geom;
+      return poly.getArea();
+    } else if(geom 
+       instanceof MultiPolygon){
+      MultiPolygon poly = 
+         (MultiPolygon) geom;
+      return poly.getArea();
+    } else {
+      return 0;
+    }
+  }
+
+Implémentation de evaluate(2) 
+================================================================================
+
+L'implémentation de evaluate devient donc :
+
+::
+
+  public Value evaluate(
+       SQLDataSourceFactory dsf, 
+       Value... args) 
+     throws FunctionException {
+   double area = getGeometryArea(
+       args[0].getAsGeometry());
+   int i = args[1].getAsInt();
+   return ValueFactory.createValue(area/i);
+  }
+
+Déclaration de la fonction de le FunctionManager
+================================================================================
+
+Notre fonction est désormais complète, prête à être exécutée. Nous devons
+l'ajouter au FunctionManager afin de pouvoir l'utiliser depuis le logiciel.
+Nous ajoutons donc la ligne
+
+::
+
+  addFunction(ST_Density.class);
+
+dans le bloc statique de FunctionManager. Une fois fait, on recompile nos
+bibliothèques, on lance le logiciel... et on peut utiliser la fonction !
 
 
 
