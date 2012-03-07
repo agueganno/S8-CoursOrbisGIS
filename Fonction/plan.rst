@@ -1197,10 +1197,10 @@ L'implémentation de evaluate devient donc :
    double area = getGeometryArea(
        args[0].getAsGeometry());
    int i = args[1].getAsInt();
-   return ValueFactory.createValue(area/i);
+   return ValueFactory.createValue(i/area);
   }
 
-Déclaration de la fonction de le FunctionManager
+Déclaration de la fonction dans le FunctionManager
 ================================================================================
 
 Notre fonction est désormais complète, prête à être exécutée. Nous devons
@@ -1214,15 +1214,180 @@ Nous ajoutons donc la ligne
 dans le bloc statique de FunctionManager. Une fois fait, on recompile nos
 bibliothèques, on lance le logiciel... et on peut utiliser la fonction !
 
+Création d'une fonction table
+================================================================================
 
+Nous allons cette fois créer une fonction table, qui calculera l'enveloppe 
+convexe d'une table contenant un champ géométrique.
 
+Encore une fois, nous devons implémenter une interface, TableFunction, dont
+un début d'implémentation est présent dans AbstractTableFunction. Nous avons
+donc :
 
+::
 
+  package org.gdms.sql.function.shuit;
+  import org.gdms.sql.function.table.
+    AbstractTableFunction;
+  public class ConvexHull
+    extends AbstractTableFunction{}
 
+Ce qu'il nous reste à faire
+================================================================================
 
+Ici encore, nous allons devoir implémenter des méthodes afin de respecter le
+contrat passé avec l'interface TableFunction. Le fonctionnement de certaines
+ne change pas :
 
+- getDescrption
+- getName
+- getSQLOrder
+- getFunctionSignature
 
+Les trois méthodes restantes vont donc particulièrement retenir notre 
+attention :
 
+- getMetadata
+- evaluate
+
+Description des méthodes : getMetadata
+================================================================================
+
+C'est le pendant de getType, mais pour les fonctions table. À la différence des
+fonctions scalaires, nous ne retournons pas une Value, mais un DataSet. Par 
+conséquent, le type de retour décrit le DataSet, pas une Value.
+
+Dans notre cas, nous allons renvoyer une table avec une colonne géométrique :
+
+Implémentation de getMetadata
+================================================================================
+
+::
+
+  public Metadata getMetadata(
+    Metadata[] tables) 
+    throws DriverException {
+  Type f = TypeFactory.createType(
+    Type.GEOMETRY);
+  String n = "the_geom";
+  DefaultMetadata ret = 
+     new DefaultMetadata();
+  ret.addField(n, f);
+  return ret;
+  }
+
+Description des méthodes : getFunctionSignatures
+================================================================================
+
+Bien que le rôle de cette méthode soit le même que pour les fonctions scalaires,
+deux nuances vont apparaître :
+
+- Nous allons renvoyer une table, représentée ici par une instance de 
+  TableDefinition, pas de Type
+- Notre argument est une table, pas un scalaire, nous allons donc utiliser une
+  instance de TableArgument
+
+Implémentation de getFunctionSignatures
+================================================================================
+
+::
+
+  public FunctionSignature[]
+    getFunctionSignatures() {
+  return new FunctionSignature[]{
+    new TableFunctionSignature(
+      TableDefinition.GEOMETRY,
+      new TableArgument(
+         TableDefinition.GEOMETRY))
+  };
+  }
+
+Description des méthodes : evaluate
+================================================================================
+
+Cette méthode à le même rôle que pour les fonctions scalaires. Ses paramètres
+sont plus riches : elle peut recevoir à la fois des tables et des valeurs en
+entrée. Elle renvoie un DataSet plutôt qu'une Value. 
+
+Enfin, un paramètre (pm) intervient également. Il permet d'estimer le temps de
+traitement restant avant la fin de l'exécution de la méthode. Nous ne
+l'utiliserons pas (par souci de simplicité).
+
+Pour implémenter la méthode, nous allons :
+
+- Récupérer la table qui nous intéresse.
+- La parcourir à la recherche de géométries.
+- Étendre petit à petit une enveloppe convexe.
+- Créer une table contenant cette enveloppe convexe.
+
+Implémentation de evaluate
+================================================================================
+
+::
+
+  public DataSet evaluate(
+    SQLDataSourceFactory dsf, DataSet[] tables, 
+    Value[] values, ProgressMonitor pm) 
+    throws FunctionException {
+  try{
+    Geometry hull=null;
+    DataSet tab = tables[0];
+    int gi = MetadataUtilities.
+       getGeometryFieldIndex(tab.getMetadata());
+    for(int i=0; i<tab.getRowCount();i++){
+      Geometry geom = tab.getGeometry(i, gi);
+      if(hull == null && geom != null){
+       hull = geom.convexHull();
+      }
+      
+Implémentation de evaluate (2)
+================================================================================
+
+::
+
+      else if(geom != null){
+       Geometry union = geom.union(hull);
+       hull = union.convexHull();
+      }
+    }
+    MemoryDataSetDriver ret = 
+      new MemoryDataSetDriver(getMetadata(null));
+    ret.addValues(ValueFactory.createValue(hull));
+    } catch (DriverException ex) {
+     throw new FunctionException(ex);
+    }
+    }
+
+Déclaration de la fonction dans le FunctionManager
+================================================================================
+
+Notre fonction est désormais complète, prête à être exécutée. Nous devons
+l'ajouter au FunctionManager afin de pouvoir l'utiliser depuis le logiciel.
+Nous ajoutons donc la ligne
+
+::
+
+  addFunction(ConvexHull.class);
+
+dans le bloc statique de FunctionManager. Une fois fait, on recompile nos
+bibliothèques, on lance le logiciel... et on peut utiliser la fonction !
+
+Conclusion
+================================================================================
+
+Au travers de ce cours, nous avons découvert les rouages d'OrbisGIS. Nous avons 
+identifié les différentes couches nécessaires au traitement des données dans ce
+logiciel SIG.
+
+Nous nous sommes ensuite plongés dans les rouages du logiciel. Nous avons étudié
+les éléments d'OrbisGIS nous permettant :
+
+- De manipuler les types et valeurs
+- De manipuler les sources de données
+- De créer de nouvelles fonctions SQL 
+
+Ces différentes étapes nous ont permis d'enrichir le logiciel de nouvelles
+fonctions d'analyse.
 
 
 
