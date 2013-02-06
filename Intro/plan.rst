@@ -53,7 +53,7 @@ Concrètement, ça marche ?
 Plusieurs formats de données sont gérés par les pilotes :
 
 * Des formats de fichiers : SHP, GDMS, MIF/MID, DXF...
-* Les bases de données spatiales PostGIS
+* Les bases de données spatiales  : PostGIS, H2Spatial...
 
 Des importeurs commencent à faire leur apparition (GPX)
 
@@ -194,10 +194,10 @@ Les indexes spatiaux (3)
 .. image:: RTree.png
   :width: 65%
 
-La couche de manipulation des données : gdmsql
+Une implémentation intégrée du langage SQL.
 ================================================================================
 
-La couche de manipulation des données : gdmsql
+La couche de manipulation des données
 --------------------------------------------------------------------------------
 
 GDMS est la couche de manipulation des données. Elle permet de :
@@ -207,9 +207,10 @@ GDMS est la couche de manipulation des données. Elle permet de :
 - Gérer les sources de données
 - Décrire les données
 
-Les autres manipulations ne sont a priori pas prévues. C'est le rôle de GDMSQL.
+Les autres manipulations ne sont a priori pas prévues. GDMS embarque un moteur
+SQL pour pallier cette faiblesse.
 
-GDMSQL : Une implémentation SQL avec fonctions spatiales.
+Une implémentation SQL avec fonctions spatiales.
 --------------------------------------------------------------------------------
 
 Le SQL est le langage de référence pour la manipulation des données dans 
@@ -238,10 +239,10 @@ du langage de manipulation des données inclus dans OrbisGIS.
 Séparation de la gestion et de la manipulation-> possibilité de changer le 
 langage de manipulation sans altérer la gestion des données.
 
-Ce que contient GDMSQL
+Ce que contient le moteur SQL.
 --------------------------------------------------------------------------------
 
-GDMSQL est constitué de plusieurs parties :
+Il est constitué de plusieurs parties :
 
 - Un moteur d'interprétation du langage SQL
 - Des fonctions définies dans la norme Simple Feature SQL (SFS), tout commme 
@@ -258,9 +259,9 @@ La couche de représentation des données
 La couche de représentation des données
 --------------------------------------------------------------------------------
 
-GDMS et GDMSQL ne permettent que de manipuler les données. Au même titre que 
-PostGIS ne peut pas produire directement une carte, GDMS/QL n'embarque aucune
-fonctionnalité de représentation.
+GDMS et son moteur SQL ne permettent que de manipuler les données. Au même titre
+que PostGIS ne peut pas produire directement une carte, GDMS/QL n'embarque
+aucune fonctionnalité de représentation.
 
 Ce dont on a besoin pour produire une carte
 --------------------------------------------------------------------------------
@@ -307,13 +308,26 @@ carte. On parcourt les couches de données, et pour chacune d'entre elles on
 applique les analyses présentes. On est donc capable de produire une image qui
 pourra être présentée à l'utilisateur.
 
-Une brique en train d'être refondue...
+Une brique en cours de refonte...
 --------------------------------------------------------------------------------
 
-- L'architecture actuelle du moteur de rendu d'OrbisGIS ne permet pas 
+- L'architecture originelle du moteur de rendu d'OrbisGIS ne permet pas 
   d'effectuer des analyses thématiques exotiques. 
 - Une norme de symbologie (Symbology Encoding 2.0) est en train d'être finalisée
   et permet d'aller beaucoup plus loin.
+
+Objectif : assurer la modularité et augmenter la richesse symbologique et
+l'interopérabilité entre les différents SIG.
+
+SE et les analyses thématiques
+--------------------------------------------------------------------------------
+
+L'introduction de Symbology Encoding 2.0 pose un problème supplémentaire : le
+modèle n'est pas fait pour décrire directement les analyses faites par les
+thématiciens et les cartographes. Par conséquent :
+
+- On fait de la reconnaissance de motif
+- On fournit des gabarits pour les analyses courantes
 
 L'interface graphique d'OrbisGIS
 ================================================================================
@@ -324,7 +338,16 @@ L'interface graphique d'OrbisGIS
 Au dessus de toutes les briques que nous avons déjà citées, on trouve 
 l'interface graphique d'OrbisGIS. Elle présente une vision cohérente de 
 l'architecture du logiciel. On retrouve ainsi des modules en cohérence avec les
-briques qui ont été présentées.
+briques qui ont été présentées
+
+Une interface entièrement modulaire.
+--------------------------------------------------------------------------------
+
+À l'instar des autres briques du logiciel, l'interface est modulaire. Elle est
+construite à l'aide de deux bibliothèques :
+
+- DockingFrames gère l'organisation des briques visuelles de la fenêtre.
+- OSGi permet de déclarer et gérer des plugins à chaud.
 
 Le GeoCatalog
 --------------------------------------------------------------------------------
@@ -337,8 +360,8 @@ données.
 La Console SQL
 --------------------------------------------------------------------------------
 
-C'est le lien avec GDMSQL. Ici, l'utilisateur peut écrire des procédures et les
-faire exécuter par le moteur SQL. 
+C'est le lien avec le moteur SQL. Ici, l'utilisateur peut écrire des procédures
+et les faire exécuter par le moteur SQL.
 
 Note : La syntaxe SQL a évolué dans la version 4.0, et est beaucoup plus proche
 de la norme SQL 92. Par conséquent, certains scripts SQL valides dans la version
@@ -371,7 +394,7 @@ BeanShell apporte plusieurs choses à OrbisGIS :
 - La notion de boucle dans les algorithmes
 
 Par conséquent, il devient possible de manipuler l'interface, d'appeler des 
-procédure SQL dans des boucles, de modifier la légend des couches depuis les 
+procédure SQL dans des boucles, de modifier la légende des couches depuis les
 scripts...
 
 Le BeanShell par la pratique...
