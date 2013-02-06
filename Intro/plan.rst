@@ -8,9 +8,8 @@ Objectifs du cours
 Objectifs du cours : 
 
 - Présenter certains principes essentiels en informatique appliquée à la
-  géographie
-- Appliquer ces principes en développant au sein du logiciel SIG OrbsiGIS
-
+  géographie.
+- Découvrir et manipuler les interfaces de programmation d'OrbisGIS.
 
 OrbisGIS- Principes de fonctionnement
 ================================================================================
@@ -266,7 +265,7 @@ aucune fonctionnalité de représentation.
 Ce dont on a besoin pour produire une carte
 --------------------------------------------------------------------------------
 
-- Être capable d'associer un symbole à un objet spatial
+- Être capable de définir comment dessiner un symbole sur la carte
 - Savoir définir des méthodes de classification des données adaptées à la
   représentation
 - Savoir dessiner une carte en s'appuyant sur les données et sur les paramètres
@@ -294,9 +293,9 @@ Des analyses thématiques à disposition
 Plusieurs analyses peuvent être réalisées sur les données :
 
 - Symbole unique
-- Valeurs uniques
+- Valeurs uniques - EN COURS
 - Symboles proportionnels
-- Classifications par intervalles (choroplèthes)
+- Classifications par intervalles (choroplèthes) - EN COURS
 
 On peut affecter plusieurs analyses à une même couche.
 
@@ -307,6 +306,17 @@ En se basant sur toutes ces informations, nous sommes en mesure de dessiner la
 carte. On parcourt les couches de données, et pour chacune d'entre elles on 
 applique les analyses présentes. On est donc capable de produire une image qui
 pourra être présentée à l'utilisateur.
+
+Une structure purement arborescente
+--------------------------------------------------------------------------------
+
+La définition de la structure de la carte (groupes de couches, couches, styles,
+objets nécessaires au dessin) est purement arborescente. Cela :
+
+- Simplifie certaines analyses de la structure de la carte et des styles
+- Reflète l'architecture de Symbology Encoding (XML)
+- Permet d'obtenir de bonnes performances de rendu (parcours simple de la
+  définition des objets à dessiner).
 
 Une brique en cours de refonte...
 --------------------------------------------------------------------------------
@@ -372,7 +382,8 @@ Le MapContext, la TOC, la carte
 --------------------------------------------------------------------------------
 
 La carte et la table des matières sont directement liées. Elles permettent de 
-contrôler l'organisation des couches, les analyses thématiques...
+contrôler l'organisation des couches, les styles et les règles utilisées pour
+le dessin...
 
 La console BeanShell
 --------------------------------------------------------------------------------
@@ -402,6 +413,18 @@ Le BeanShell par la pratique...
 
 BeanShell est un bon moyen de découvrir le API d'OrbisGIS. Pour ça, nous avons
 besoin du logiciel.
+
+GDMS et BeanShell : des outils à conserver ?
+--------------------------------------------------------------------------------
+
+Le maintien du moteur SQL dans GDMS et de BeanShell dans OrbisGIS sont tous
+deux remis en question. Les raisons :
+
+- Maintenabilité
+- Performances
+- Diffusion
+
+Dans tous les cas, ils seraient remplacés, pas supprimés.
 
 Quelques petits rappels sur le Java
 --------------------------------------------------------------------------------

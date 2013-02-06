@@ -30,11 +30,20 @@ Les systèmes de gestion de version
 
 Pour résoudre ces problèmes, on peut s'appuyer sur un système de gestion de 
 versions. La solution utilisée actuellement par l'équipe de développement
-d'OrbisGIS s'appelle Subversion (SVN).
+d'OrbisGIS s'appelle Git.
 
-http://subversion.tigris.org
+http://git-scm.com/
 
-Les apports de SVN - la notion de commit
+Les apports de Git - Un système décentralisé
+================================================================================
+
+Chaque développeur possède son propre dépôt. L'équipe met ses codes en commun
+par le biais d'un dépôt central. Les apports :
+
+- Possibilité de travailler hors-ligne
+- Grande liberté pour la création de branches et pour les commits (cf. infra)
+
+Les apports de Git - Commit
 ================================================================================
 
 Pour mieux comprendre les modifications apportées par les développeurs, il est
@@ -51,38 +60,61 @@ sont généralement suffisantes pour :
 - Apprécier la qualité du code produit
 - Éventuellement, apporter des critiques à propos de la modification
 
-Les apports de SVN - la notion de commit : exemple
+Les apports de Git - la notion de commit : exemple
 ================================================================================
 
 .. image:: diff.png
   :width: 75%
 
 
-Les apports de SVN - le suivi des modifications
+Les apports de Git - le suivi des modifications
 ================================================================================
 
 Quand une modification est prête, le développeur peut la commiter. Cela revient
-à publier les changements sur le dépôt SVN. Par conséquent :
+à publier les changements sur le dépôt Git. Par conséquent :
 
 - Le commit devient accesible à tous les développeurs du projet
 - Le commit est associé par le serveur à son auteur
 
-Les apports de SVN - la notion d'historique (1)
+Les apports de Git - les branches (1)
+================================================================================
+
+Une branche représente une divergence dans la base de code. Pour ajouter une
+fonctionnalité, on va :
+
+- Créer une nouvelle "branche", indépendante de la base de code principale
+- Faire les modifications et les commits nécessaires
+- Fusionner la branche modifiée dans la branche principale (qui peut avoir reçu
+  des commits entre temps).
+
+Les apports de Git - les branches (2)
+================================================================================
+
+L'utilisation de branches va améliorer les échanges entre les développeurs d'une
+équipe :
+
+- On peut faire valider les modifications d'une branche avant de les inclure
+  dans le dépôt principal du logiciel
+- On peut imposer à quelqu'un de modifier ses codes avant de les accepter
+- Chaque développeur peut travailler en toute sécurité, sans risquer de briser
+  la base de code du reste de l'équipe
+
+Les apports de Git - la notion d'historique (1)
 ================================================================================
 
 Une modification, une fois commitée, est ajoutée à l'historique du projet. Dans
-SVN, l'historique est linéaire : tous les commits sont présentés les uns à la
-suite des autres. À chaque commit est associé un numero de *révision*.
+Git, l'historique est un graphe : tous les commits sont inclus dans des branches
+qui peuvent diverger et converger. À chaque commit est associé un identifiant
+unique.
 
-Il est possible d'interroger assez finement l'historique d'un dépôt SVN. Ainsi,
+Il est possible d'interroger assez finement l'historique d'un dépôt Git. Ainsi,
 nous pouvons :
 
-- Connaître toutes les modifications et tous les messages de chacune des 
-  révisions
+- Connaître toutes les modifications et tous les messages de chacun des commits
 - Connaître précisément l'historique de chacune des lignes de chacun des 
   fichiers
 
-Les apports de SVN - la notion d'historique (2)
+Les apports de Git - la notion d'historique (2)
 ================================================================================
 
 Grâce à l'historique, nous pouvons donc connaître "exactement" :
@@ -94,30 +126,32 @@ Grâce à l'historique, nous pouvons donc connaître "exactement" :
 Ces deux points sont bien sûr contraints :
 
 - À la qualité des messages de commit
-- À la qualité de la gestion du dépôt SVN.
+- À la qualité de la gestion des dépôts Git de l'équipe.
 
-Les apports de SVN - la notion d'historique (3)
+Les apports de Git - la notion d'historique (3)
 ================================================================================
 
 Grâce à l'historique, on évite parfois les catastrophes. Par exemple, on est 
-à l'abri d'une suppression accidentelle de fichiers. On peut toujours requêter
-l'historique et retrouver une ancienne version. Du moins tant que le serveur
-est vivant...
+à l'abri d'une suppression accidentelle de fichiers. On peut toujours aller dans
+l'historique et retrouver une ancienne version. Du moins tant que le depôt n'a
+pas été supprimé...
 
-SVN - quelques commandes de base
+Git - quelques commandes de base
 ================================================================================
 
-- svn checkout : Récupérer une copie locale d'un dépôt distant
-- svn diff : Consulter les modifications apportées à la copie locale
-- svn commit : Commiter les fichiers sur le serveur
-- svn up : Récupérer les modifications poussées sur le serveur par les autres
-  développeurs
+- git checkout : Restaurer un fichier depuis l'historique
+- git diff : Consulter les modifications apportées à la copie locale
+- git add : Ajouter un fichier à l'ensemble des modifications sur le point
+  d'être commitées
+- git commit : Commiter les modifications dans l'historique
+- git fetch : Récupérer les modifications commitées sur un dépôt distant
+- git push : Pousser les commits locaux sur un dépôt distant
 
 
-SVN - conclusion
+Git - conclusion
 ================================================================================
 
-SVN est un outil qui permet de conserver une vision claire :
+Git est un outil qui permet de conserver une vision claire :
 
 - Du travail effectué par tous les développeurs sur un projet
 - De l'évolution d'un projet
@@ -246,7 +280,7 @@ Nous n'avons évoqué que deux des outils indispensables à la vie du projet de
 développement OrbisGIS. Il y en a d'autres :
 
 - JUnit : Écriture de tests automatisés, protection contre les bugs
-- Hudson/Jenkins : Vérification de l'intégrité du projet
+- Jenkins : Vérification de l'intégrité du projet
 - Sonar : Évaluation de la qualité des codes
 
 GDMS et GDMSQL - de la table à la fonction
@@ -478,7 +512,7 @@ En BeanShell :
   import org.gdms.data.types.Type;
   import org.gdms.data.types.TypeFactory;
   import org.gdms.data.types.
-    GeometryDimensionConstraint;
+  GeometryDimensionConstraint;
 
   //On veut des objets ponctuels
   GeometryDimensionConstraint gdc = 
@@ -880,8 +914,8 @@ Préambule...
 ================================================================================
 
 Nous atteignons un stade où il n'est plus possible de remplir nos objectifs à
-l'aide du BeanShell. Nous allons installer un nouvel outil Netbeans, afin
-de pouvoir utiliser Maven et SVN. L'installation se fera sous Linux, pour 
+l'aide du BeanShell. Nous allons utiliser un nouvel outil, Netbeans, afin
+de pouvoir utiliser Maven et Git. L'installation se fera sous Linux, pour 
 des raisons pratiques...
 
 GDMSQL, une couche extensible
