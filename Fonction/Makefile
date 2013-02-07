@@ -43,7 +43,7 @@ slides.tex: plan.rst
 	@sed -i slides.tex -e '/\date/ a\
 	\\title{Programmation spatiale sous OrbisGIS - Fonction GDMSQL}'
 	@sed -i slides.tex -e 's/author{}/author{Alexis \\textsc{Guéganno} \\and Jean-Yves \\textsc{Martin}}/'
-	@sed -i slides.tex -e 's/date{}/date{10 février 2012}/'
+	@sed -i slides.tex -e 's/date{}/date{8 - 14 février 2012}/'
 
 clean:
 	@echo "Nettoyage des fichiers temporaires"

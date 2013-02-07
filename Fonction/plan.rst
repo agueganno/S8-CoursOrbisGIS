@@ -146,6 +146,7 @@ Git - quelques commandes de base
 - git commit : Commiter les modifications dans l'historique
 - git fetch : Récupérer les modifications commitées sur un dépôt distant
 - git push : Pousser les commits locaux sur un dépôt distant
+- git clone : Cloner un dépôt distant.
 
 
 Git - conclusion
@@ -862,14 +863,14 @@ Ligne entière :
 ::
 
   Value[] vals = ds.getRow(0);
-  print(vals.get(2));
+  print(vals[2]);
 
 
 Valeur seule :
 
 ::
 
-  Value val = ds.getFieldValu(0,2);
+  Value val = ds.getFieldValue(0,2);
   print(val);
 
 Ou, si on veut récupérer le contenu de la Value :
@@ -1055,8 +1056,8 @@ allons renvoyer un double, la méthode devient donc :
 
 ::
 
-  public Type getType(Type[] argsTypes) {
-    return TypeFactory.createType(Type.DOUBLE);
+  public int getType(Type[] argsTypes) {
+    return TypeFactory.createType(Type.DOUBLE).getTypeCode();
   }
 
 Nous avons besoin d'importer les classes :
