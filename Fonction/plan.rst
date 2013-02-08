@@ -186,7 +186,7 @@ qui serait :
 Il reste toutefois possible de personnaliser tous les paramètres de la 
 construction du projet.
 
-Maven - le paradigme Convention over Configuration (1)
+Maven - le paradigme Convention over Configuration (2)
 ================================================================================
 
 L'architecture, en particulier, est très codifiée en Java :
@@ -284,7 +284,7 @@ développement OrbisGIS. Il y en a d'autres :
 - Jenkins : Vérification de l'intégrité du projet
 - Sonar : Évaluation de la qualité des codes
 
-GDMS et GDMSQL - de la table à la fonction
+GDMS et GDMS - de la table à la fonction
 --------------------------------------------------------------------------------
 
 Les DataSource dans GDMS
@@ -363,14 +363,10 @@ un type géométrique dédié :
 ::
 
   int GEOMETRY = 4096;
-  int POINT = 32768
-    | Type.GEOMETRY;
-  int LINESTRING = 65536
-    | Type.GEOMETRY;
-  int POLYGON = 131072
-    | Type.GEOMETRY;
-  int MULTIPOLYGON = 262144
-    | Type.GEOMETRY;
+  int POINT = 32768 | Type.GEOMETRY;
+  int LINESTRING = 65536 | Type.GEOMETRY;
+  int POLYGON = 131072 | Type.GEOMETRY;
+  int MULTIPOLYGON = 262144 | Type.GEOMETRY;
 
 Les types de données géométriques (2)
 ================================================================================
@@ -510,10 +506,7 @@ En BeanShell :
 
 ::
   
-  import org.gdms.data.types.Type;
-  import org.gdms.data.types.TypeFactory;
-  import org.gdms.data.types.
-  GeometryDimensionConstraint;
+  import org.gdms.data.types.*;
 
   //On veut des objets ponctuels
   GeometryDimensionConstraint gdc = 
@@ -908,7 +901,7 @@ Petit bilan...
 Nous avons donc toutes les cartes en main pour créer nos propres fonctions
 SQL
 
-Création de fonction dans GDMSQL
+Création de fonction dans GDMS
 --------------------------------------------------------------------------------
 
 Préambule...
@@ -919,10 +912,10 @@ l'aide du BeanShell. Nous allons utiliser un nouvel outil, Netbeans, afin
 de pouvoir utiliser Maven et Git. L'installation se fera sous Linux, pour 
 des raisons pratiques...
 
-GDMSQL, une couche extensible
+GDMS, une couche extensible
 ================================================================================
 
-On peut distinguer deux parties dans GDMSQL : 
+On peut distinguer deux parties dans le moteur SQL de GDMS : 
 
 - L'interpréteur du langage.
 - Les fonctions métiers.
@@ -975,14 +968,14 @@ et permettent, par exemple :
 - d'ajouter une couche au MapContext depuis un appel SQL.
 - de zoomer sur une zone précise d'une carte.
 
-La gestion des fonctions dans GDMSQL
+La gestion des fonctions dans GDMS
 ================================================================================
 
-Il est possible d'ajouter des fonctions à GDMSQL, par le biais de la classe
+Il est possible d'ajouter des fonctions à GDMS, par le biais de la classe
 FunctionManager. Elle permet d'ajouter et de supprimer statiquement des
 fonctions SQL lors de l'exécution du logiciel.
 
-Lors de l'exécution d'un script SQL contenant une fonction, GDMSQL interroge
+Lors de l'exécution d'un script SQL contenant une fonction, GDMS interroge
 cette classe. Il peut alors instancier la ou les fonctions nécessaire, et enfin
 exécuter le script désiré.
 
@@ -1057,7 +1050,8 @@ allons renvoyer un double, la méthode devient donc :
 ::
 
   public int getType(Type[] argsTypes) {
-    return TypeFactory.createType(Type.DOUBLE).getTypeCode();
+    return TypeFactory.createType(Type.DOUBLE)
+        .getTypeCode();
   }
 
 Nous avons besoin d'importer les classes :

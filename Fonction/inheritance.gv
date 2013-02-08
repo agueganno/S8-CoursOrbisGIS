@@ -3,9 +3,9 @@ digraph inheritance {
     size="8"
     node [shape = circle];
     Interface [color = darkgoldenrod];
-    Parser [color = gold];
-    Utilitaire [color = gold];
-    Interface -> Parser [ label = "Directe" color = blue ];
-    Parser -> Utilitaire [ label = "Transitive" color = blue ];
+    Core [color = gold];
+    GDMS [color = gold];
+    Interface -> Core [ label = "Directe" color = blue ];
+    Core -> GDMS [ label = "Transitive" color = blue ];
 }
 
