@@ -41,7 +41,7 @@ slides.tex: plan.rst
 	@sed -i slides.tex -e '/\date/ a\
 	\\title{Initiation à la programmation spatiale sous OrbisGIS}'
 	@sed -i slides.tex -e 's/author{}/author{Alexis \\textsc{Guéganno} \\and Jean-Yves \\textsc{Martin}}/'
-	@sed -i slides.tex -e 's/date{}/date{9 février 2012}/'
+	@sed -i slides.tex -e 's/date{}/date{7 février 2013}/'
 
 
 clean:
